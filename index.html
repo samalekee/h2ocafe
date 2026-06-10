@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H2O Cafe & Pica-Pica POS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { display: flex; background-color: #0b2533; color: #fff; height: 100vh; padding: 20px; gap: 20px; }
+        
+        /* Left Side: Menu Grid */
+        .menu-container { flex: 2; overflow-y: auto; background: #123446; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        h1, h2 { margin-bottom: 15px; color: #fff; text-align: center; }
+        h1 { border-bottom: 3px solid #3ca0c9; padding-bottom: 10px; font-size: 1.8rem; letter-spacing: 1px; }
+        .section-title { font-size: 1.1rem; color: #3ca0c9; margin: 25px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #3ca0c9; padding-left: 10px; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+        
+        /* Menu Item Cards */
+        .item-card { background: #1a445c; border: 1px solid #255d7d; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; min-height: 100px; }
+        .item-card:hover { transform: translateY(-3px); border-color: #4cd137; box-shadow: 0 4px 12px rgba(76, 209, 55, 0.3); background: #1f526e; }
+        .item-name { font-weight: 600; color: #fff; font-size: 0.95rem; }
+        .item-price { color: #4cd137; font-weight: bold; margin-top: 5px; font-size: 1rem; }
+
+        /* Right Side: POS Receipt Cart */
+        .cart-container { flex: 1; background: #0e1d25; color: white; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.4); border: 1px solid #1a3442; }
+        .cart-container h2 { border-bottom: 2px solid #1a3442; padding-bottom: 10px; }
+        .cart-items { flex-grow: 1; overflow-y: auto; margin-bottom: 20px; list-style: none; padding-top: 10px; }
+        .cart-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #1a3442; font-size: 0.95rem; color: #dcdde1; }
+        
+        /* Add-ons Section */
+        .addons-container { background: #123446; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #255d7d; }
+        .addons-title { font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; color: #3ca0c9; text-transform: uppercase; }
+        .addon-buttons { display: flex; gap: 8px; }
+        .btn-addon { flex: 1; padding: 8px; font-size: 0.8rem; background: #1a445c; border: 1px solid #255d7d; color: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-addon:hover { background: #3ca0c9; border-color: #3ca0c9; }
+
+        /* Summary & Buttons */
+        .cart-total { font-size: 1.5rem; font-weight: bold; display: flex; justify-content: space-between; padding-top: 15px; border-top: 2px solid #1a3442; margin-bottom: 15px; color: #4cd137; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn-clear { background-color: #e84118; color: white; }
+        .btn-clear:hover { background-color: #c23616; }
+        
+        @media (max-width: 768px) { body { flex-direction: column; height: auto; } .cart-container { height: 450px; } }
+    </style>
+</head>
+<body>
+
+    <div class="menu-container">
+        <h1>H2O CAFE & PICA-PICA</h1>
+        
+        <div class="section-title">Iced Coffee</div>
+        <div class="grid">
+            <div class="item-card" onclick="addToOrder('Spanish Latte', 60)">
+                <div class="item-name">Spanish Latte</div><div class="item-price">₱60</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Caramel Macchiato', 60)">
+                <div class="item-name">Caramel Macchiato</div><div class="item-price">₱60</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Salted Caramel', 65)">
+                <div class="item-name">Salted Caramel</div><div class="item-price">₱65</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Dirty Matcha', 65)">
+                <div class="item-name">Dirty Matcha</div><div class="item-price">₱65</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Iced Mocha', 65)">
+                <div class="item-name">Iced Mocha</div><div class="item-price">₱65</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Vanilla Latte', 65)">
+                <div class="item-name">Vanilla Latte</div><div class="item-price">₱65</div>
+            </div>
+        </div>
+
+        <div class="section-title">Milky Series</div>
+        <div class="grid">
+            <div class="item-card" onclick="addToOrder('Berry Matcha', 65)">
+                <div class="item-name">Berry Matcha</div><div class="item-price">₱65</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Matcha Milk', 60)">
+                <div class="item-name">Matcha Milk</div><div class="item-price">₱60</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Strawberry Milky', 60)">
+                <div class="item-name">Strawberry Milky</div><div class="item-price">₱60</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Choco Berry', 65)">
+                <div class="item-name">Choco Berry</div><div class="item-price">₱65</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Blueberry Milky', 60)">
+                <div class="item-name">Blueberry Milky</div><div class="item-price">₱60</div>
+            </div>
+        </div>
+
+        <div class="section-title">Fruit Soda & H2O Specials</div>
+        <div class="grid">
+            <div class="item-card" onclick="addToOrder('Blueberry Soda', 50)">
+                <div class="item-name">Blueberry Soda</div><div class="item-price">₱50</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Strawberry Soda', 50)">
+                <div class="item-name">Strawberry Soda</div><div class="item-price">₱50</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Lychee Soda', 50)">
+                <div class="item-name">Lychee Soda</div><div class="item-price">₱50</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Green Apple Soda', 50)">
+                <div class="item-name">Green Apple Soda</div><div class="item-price">₱50</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Milo Dinosaur', 65)">
+                <div class="item-name">Milo Dinosaur</div><div class="item-price">₱65</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Classic Lemonade', 60)">
+                <div class="item-name">Classic Lemonade</div><div class="item-price">₱60</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Yakult Lemonade', 65)">
+                <div class="item-name">Yakult Lemonade</div><div class="item-price">₱65</div>
+            </div>
+        </div>
+
+        <div class="section-title">H2O Pica-Pica</div>
+        <div class="grid">
+            <div class="item-card" onclick="addToOrder('Lumpiang Shanghai (5pcs)', 20)">
+                <div class="item-name">Lumpiang Shanghai (5pcs)</div><div class="item-price">₱20</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Tempura (3pcs)', 20)">
+                <div class="item-name">Tempura (3pcs)</div><div class="item-price">₱20</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Hotdog (Regular)', 20)">
+                <div class="item-name">Hotdog (Each)</div><div class="item-price">₱20</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Hotdog w/ Cheese', 25)">
+                <div class="item-name">Hotdog w/ Cheese</div><div class="item-price">₱25</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Siomai (Steam/Fried 3pcs)', 20)">
+                <div class="item-name">Siomai (3pcs)</div><div class="item-price">₱20</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('French Fries (Regular)', 40)">
+                <div class="item-name">French Fries (Regular)</div><div class="item-price">₱40</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('French Fries (Share)', 80)">
+                <div class="item-name">French Fries (Share)</div><div class="item-price">₱80</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Cheese Sticks (3pcs)', 20)">
+                <div class="item-name">Cheese Sticks (3pcs)</div><div class="item-price">₱20</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Siopao Ubebao', 20)">
+                <div class="item-name">Siopao Ubebao</div><div class="item-price">₱20</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Siopao Asado', 20)">
+                <div class="item-name">Siopao Asado</div><div class="item-price">₱20</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Hotdog Sandwich (Reg)', 30)">
+                <div class="item-name">Hotdog Sandwich (Reg)</div><div class="item-price">₱30</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Hotdog Sandwich w/ Cheese', 35)">
+                <div class="item-name">Hotdog Sandwich w/ Cheese</div><div class="item-price">₱35</div>
+            </div>
+            <div class="item-card" onclick="addToOrder('Kwek Kwek (3pcs)', 20)">
+                <div class="item-name">Kwek Kwek (3pcs)</div><div class="item-price">₱20</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart-container">
+        <div>
+            <h2>Current Order</h2>
+            <ul id="cart-items" class="cart-items"></ul>
+        </div>
+        
+        <div>
+            <div class="addons-container">
+                <div class="addons-title">Quick Drink Add-Ons:</div>
+                <div class="addon-buttons">
+                    <button class="btn-addon" onclick="addDrinkAddon('+ Espresso Shot', 10)">+ Shot (+₱10)</button>
+                    <button class="btn-addon" onclick="addDrinkAddon('+ Size up 22oz', 20)">+ 22oz (+₱20)</button>
+                </div>
+            </div>
+
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="total-amount">₱0.00</span>
+            </div>
+            <button class="btn btn-clear" onclick="clearOrder()">Clear Order</button>
+        </div>
+    </div>
+
+    <script>
+        let order = [];
+        let total = 0;
+
+        function addToOrder(name, price) {
+            let existingItem = order.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                order.push({ name: name, price: price, quantity: 1 });
+            }
+            updateReceiptDisplay();
+        }
+
+        // Feature to apply espresso shot or size ups to the order total
+        function addDrinkAddon(addonName, price) {
+            if(order.length === 0) {
+                alert("Please add a drink or item to the order first!");
+                return;
+            }
+            order.push({ name: addonName, price: price, quantity: 1 });
+            updateReceiptDisplay();
+        }
+
+        function updateReceiptDisplay() {
+            const cartList = document.getElementById('cart-items');
+            const totalDisplay = document.getElementById('total-amount');
+            
+            cartList.innerHTML = '';
+            total = 0;
+
+            order.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                const li = document.createElement('li');
+                li.className = 'cart-item';
+                li.innerHTML = `
+                    <span>${item.quantity}x ${item.name}</span>
+                    <span>₱${itemTotal.toFixed(2)}</span>
+                `;
+                cartList.appendChild(li);
+            });
+
+            totalDisplay.innerText = `₱${total.toFixed(2)}`;
+        }
+
+        function clearOrder() {
+            order = [];
+            updateReceiptDisplay();
+        }
+    </script>
+</body>
+</html>
