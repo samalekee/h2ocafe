@@ -27,7 +27,13 @@
 
         /* Right Side: POS Receipt Cart */
         .cart-container { flex: 1; background: #0e1d25; color: white; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.4); border: 1px solid #1a3442; }
-        .cart-container h2 { border-bottom: 2px solid #1a3442; padding-bottom: 10px; }
+        .cart-container h2 { border-bottom: 2px solid #1a3442; padding-bottom: 10px; margin-bottom: 10px; }
+        
+        /* Table Selector Styles */
+        .table-selector-container { margin-bottom: 15px; background: #123446; padding: 10px; border-radius: 8px; border: 1px solid #255d7d; }
+        .table-label { font-size: 0.85rem; font-weight: bold; color: #3ca0c9; display: block; margin-bottom: 5px; text-transform: uppercase; }
+        .table-select { width: 100%; padding: 8px; background: #0e1d25; color: #fff; border: 1px solid #255d7d; border-radius: 4px; font-size: 1rem; font-weight: bold; outline: none; cursor: pointer; }
+        
         .cart-items { flex-grow: 1; overflow-y: auto; margin-bottom: 20px; list-style: none; padding-top: 10px; }
         .cart-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #1a3442; font-size: 0.95rem; color: #dcdde1; }
         
@@ -38,13 +44,19 @@
         .btn-addon { flex: 1; padding: 8px; font-size: 0.8rem; background: #1a445c; border: 1px solid #255d7d; color: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .btn-addon:hover { background: #3ca0c9; border-color: #3ca0c9; }
 
-        /* Summary & Buttons */
+        /* Summary & Action Buttons */
         .cart-total { font-size: 1.5rem; font-weight: bold; display: flex; justify-content: space-between; padding-top: 15px; border-top: 2px solid #1a3442; margin-bottom: 15px; color: #4cd137; }
+        
+        .action-buttons { display: flex; flex-direction: column; gap: 10px; }
         .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        .btn-clear { background-color: #e84118; color: white; }
+        
+        .btn-proceed { background-color: #4cd137; color: white; }
+        .btn-proceed:hover { background-color: #44bd32; }
+        
+        .btn-clear { background-color: #e84118; color: white; padding: 8px; font-size: 0.9rem; }
         .btn-clear:hover { background-color: #c23616; }
         
-        @media (max-width: 768px) { body { flex-direction: column; height: auto; } .cart-container { height: 450px; } }
+        @media (max-width: 768px) { body { flex-direction: column; height: auto; } .cart-container { height: 550px; } }
     </style>
 </head>
 <body>
@@ -195,6 +207,19 @@
     <div class="cart-container">
         <div>
             <h2>Current Order</h2>
+            
+            <div class="table-selector-container">
+                <label class="table-label" for="table-select">Select Table / Order Type:</label>
+                <select id="table-select" class="table-select" onchange="switchTable()">
+                    <option value="Takeout">Takeout / Walk-in</option>
+                    <option value="Table 1">Table 1</option>
+                    <option value="Table 2">Table 2</option>
+                    <option value="Table 3">Table 3</option>
+                    <option value="Table 4">Table 4</option>
+                    <option value="Table 5">Table 5</option>
+                </select>
+            </div>
+            
             <ul id="cart-items" class="cart-items"></ul>
         </div>
         
@@ -211,30 +236,45 @@
                 <span>Total:</span>
                 <span id="total-amount">₱0.00</span>
             </div>
-            <button class="btn btn-clear" onclick="clearOrder()">Clear Order</button>
+            
+            <div class="action-buttons">
+                <button class="btn btn-proceed" onclick="proceedAndPrint()">Proceed & Print</button>
+                <button class="btn btn-clear" onclick="clearOrder()">Clear Order</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let order = [];
-        let total = 0;
+        let tableOrders = {
+            "Takeout": [], "Table 1": [], "Table 2": [], "Table 3": [], "Table 4": [], "Table 5": []
+        };
+        
+        let currentTable = "Takeout";
 
         function addToOrder(name, price) {
-            let existingItem = order.find(item => item.name === name);
+            let currentOrder = tableOrders[currentTable];
+            let existingItem = currentOrder.find(item => item.name === name);
+            
             if (existingItem) {
                 existingItem.quantity += 1;
             } else {
-                order.push({ name: name, price: price, quantity: 1 });
+                currentOrder.push({ name: name, price: price, quantity: 1 });
             }
             updateReceiptDisplay();
         }
 
         function addDrinkAddon(addonName, price) {
-            if(order.length === 0) {
-                alert("Please add a drink or item to the order first!");
+            let currentOrder = tableOrders[currentTable];
+            if(currentOrder.length === 0) {
+                alert(`Please add an item to ${currentTable} first!`);
                 return;
             }
-            order.push({ name: addonName, price: price, quantity: 1 });
+            currentOrder.push({ name: addonName, price: price, quantity: 1 });
+            updateReceiptDisplay();
+        }
+
+        function switchTable() {
+            currentTable = document.getElementById('table-select').value;
             updateReceiptDisplay();
         }
 
@@ -243,9 +283,10 @@
             const totalDisplay = document.getElementById('total-amount');
             
             cartList.innerHTML = '';
-            total = 0;
+            let total = 0;
+            let currentOrder = tableOrders[currentTable];
 
-            order.forEach(item => {
+            currentOrder.forEach(item => {
                 const itemTotal = item.price * item.quantity;
                 total += itemTotal;
 
@@ -262,8 +303,90 @@
         }
 
         function clearOrder() {
-            order = [];
+            tableOrders[currentTable] = [];
             updateReceiptDisplay();
+        }
+
+        // --- NEW ACTION FUNCTION: PROCEED & PRINT/SAVE ---
+        function proceedAndPrint() {
+            let currentOrder = tableOrders[currentTable];
+            
+            if (currentOrder.length === 0) {
+                alert(`There are no active items in ${currentTable} to process!`);
+                return;
+            }
+
+            let total = 0;
+            let receiptRows = '';
+            
+            currentOrder.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                receiptRows += `
+                    <tr>
+                        <td style="padding: 5px 0;">${item.quantity}x ${item.name}</td>
+                        <td style="text-align: right; padding: 5px 0;">₱${itemTotal.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            const dateString = new Date().toLocaleString();
+
+            // Create a hidden iframe window customized specifically for clean document generation
+            const printWindow = window.open('', '_blank', 'height=600,width=400');
+            
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Receipt - ${currentTable}</title>
+                    <style>
+                        body { font-family: 'Courier New', Courier, monospace; color: #000; padding: 20px; width: 300px; margin: 0 auto; }
+                        .text-center { text-align: center; }
+                        .separator { border-top: 1px dashed #000; margin: 10px 0; }
+                        table { width: 100%; border-collapse: collapse; }
+                        .total-row { font-weight: bold; font-size: 1.2rem; }
+                    </style>
+                </head>
+                <body>
+                    <h2 class="text-center">H2O CAFE</h2>
+                    <p class="text-center" style="font-size: 0.9rem;">& PICA-PICA POS</p>
+                    <div class="separator"></div>
+                    <p><strong>Type:</strong> ${currentTable}</p>
+                    <p><strong>Date:</strong> ${dateString}</p>
+                    <div class="separator"></div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="text-align: left;">Item</th>
+                                <th style="text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${receiptRows}
+                        </tbody>
+                    </table>
+                    <div class="separator"></div>
+                    <div class="total-row">
+                        <span style="float: left;">TOTAL:</span>
+                        <span style="float: right;">₱${total.toFixed(2)}</span>
+                    </div>
+                    <div style="clear: both;"></div>
+                    <div class="separator"></div>
+                    <p class="text-center" style="margin-top: 20px; font-size: 0.9rem;">Thank you! Come again.</p>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            window.close();
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+
+            // Clear the table's cart after checkout is initiated
+            clearOrder();
         }
     </script>
 </body>
