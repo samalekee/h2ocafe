@@ -10,8 +10,12 @@
         
         /* Left Side: Menu Grid */
         .menu-container { flex: 2; overflow-y: auto; background: #123446; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        h1, h2 { margin-bottom: 15px; color: #fff; text-align: center; }
-        h1 { border-bottom: 3px solid #3ca0c9; padding-bottom: 10px; font-size: 1.8rem; letter-spacing: 1px; }
+        
+        /* Centered Logo Styling */
+        .logo-header { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #3ca0c9; }
+        .brand-logo { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.4); border: 2px solid #3ca0c9; }
+        
+        h2 { margin-bottom: 15px; color: #fff; text-align: center; }
         .section-title { font-size: 1.1rem; color: #3ca0c9; margin: 25px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #3ca0c9; padding-left: 10px; font-weight: bold; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
         
@@ -46,7 +50,9 @@
 <body>
 
     <div class="menu-container">
-        <h1>H2O CAFE & PICA-PICA</h1>
+        <div class="logo-header">
+            <img src="image_dfe6f9.png" alt="H2O Cafe Logo" class="brand-logo">
+        </div>
         
         <div class="section-title">Iced Coffee</div>
         <div class="grid">
