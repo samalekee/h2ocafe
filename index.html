@@ -72,16 +72,35 @@
         .btn-clear:hover { background-color: #c23616; }
 
         /* Counter View Mode Styles */
-        .counter-mode-btn { position: absolute; left: 10px; top: 10px; background: #255d7d; color: #fff; padding: 6px 12px; font-size: 0.8rem; border: none; border-radius: 4px; cursor: pointer; }
         .counter-view { display: none; width: 100%; height: 100%; background: #0b2533; flex-direction: column; padding: 10px; overflow: hidden; }
         .counter-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #3ca0c9; padding-bottom: 15px; margin-bottom: 15px; gap: 10px; }
-        .orders-dashboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; overflow-y: auto; flex-grow: 1; padding-bottom: 20px; }
         
-        /* Cleaned Up Order Card Container Setup */
+        /* Layout split for counter split view */
+        .counter-body-wrapper { display: flex; gap: 20px; flex-grow: 1; overflow: hidden; height: calc(100% - 60px); }
+        .queue-side { flex: 1.2; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+        .orders-dashboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; overflow-y: auto; flex-grow: 1; padding-bottom: 20px; content-visibility: auto; }
+        
+        /* Audit History Panel Styles */
+        .audit-side { flex: 1.8; display: flex; flex-direction: column; background: #0e1d25; border: 1px solid #1a3442; border-radius: 12px; padding: 15px; height: 100%; overflow: hidden; }
+        .audit-controls { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #1a3442; }
+        .audit-date-picker { padding: 8px 12px; background: #123446; border: 1px solid #255d7d; border-radius: 4px; color: #fff; font-size: 1rem; font-weight: bold; outline: none; }
+        
+        .audit-metrics { display: flex; gap: 10px; margin-bottom: 15px; }
+        .metric-card { flex: 1; background: #123446; border: 1px solid #255d7d; padding: 10px; border-radius: 6px; text-align: center; }
+        .metric-title { font-size: 0.75rem; text-transform: uppercase; color: #3ca0c9; font-weight: bold; margin-bottom: 4px; }
+        .metric-val { font-size: 1.2rem; font-weight: bold; color: #4cd137; }
+        
+        .audit-table-container { flex-grow: 1; overflow-y: auto; background: #123446; border-radius: 8px; border: 1px solid #255d7d; }
+        .audit-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+        .audit-table th { background: #1a445c; color: #3ca0c9; padding: 10px; font-weight: bold; border-bottom: 2px solid #255d7d; text-transform: uppercase; position: sticky; top: 0; z-index: 10; }
+        .audit-table td { padding: 10px; border-bottom: 1px solid #1a3442; color: #dcdde1; vertical-align: top; }
+        .audit-table tr.clickable-row { cursor: pointer; transition: background 0.15s; }
+        .audit-table tr.clickable-row:hover { background: rgba(60, 160, 201, 0.15) !important; }
+
+        /* Order Card Setup */
         .order-pane { background: #123446; border: 2px solid #255d7d; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         .order-pane.pending { border-color: #f1c40f; }
         .order-pane.preparing { border-color: #3ca0c9; }
-        .order-pane.completed { border-color: #2ecc71; opacity: 0.7; }
         
         /* Fixed Badge Alignment Layout Block */
         .card-top-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #255d7d; padding-bottom: 8px; gap: 8px; }
@@ -92,17 +111,15 @@
         
         .badge-pending { background: #f1c40f; color: #000; }
         .badge-preparing { background: #3ca0c9; color: #fff; }
-        .badge-completed { background: #2ecc71; color: #fff; }
         
         .order-pane-items { list-style: none; margin: 10px 0; border-bottom: 1px dashed #255d7d; padding-bottom: 10px; flex-grow: 1; }
         .pane-actions { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
         .btn-pane { flex: 1; min-width: 65px; padding: 10px 5px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
         .btn-prep { background: #3498db; color: #fff; }
         .btn-comp { background: #2ecc71; color: #fff; }
-        .btn-print { background: #95a5a6; color: #fff; }
         .btn-del { background: #e74c3c; color: #fff; }
 
-        /* PAYMENT MODAL STYLES */
+        /* MODAL OVERLAY WRAPPERS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { background: #123446; width: 100%; max-width: 420px; border-radius: 12px; border: 2px solid #3ca0c9; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .modal-content h3 { margin-bottom: 15px; font-size: 1.4rem; color: #fff; }
@@ -119,46 +136,66 @@
         .btn-modal-close:hover { background: #c23616; }
         .btn-modal-done { background: #4cd137; color: white; display: none; width: 100%; }
         .btn-modal-done:hover { background: #44bd32; }
+
+        /* THERMAL RECEIPT VIEW COMPONENT */
+        .receipt-paper { background: #fff; color: #000; padding: 25px 20px; border-radius: 2px; text-align: left; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-family: 'Courier New', Courier, monospace; width: 100%; max-width: 340px; margin: 0 auto; position: relative; }
+        .receipt-center { text-align: center; margin-bottom: 15px; }
+        .receipt-divider { border-top: 1px dashed #000; margin: 12px 0; }
+        .receipt-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; }
+        .receipt-title { font-weight: bold; font-size: 1.3rem; letter-spacing: 1px; margin-bottom: 2px; font-family: inherit; }
+        .receipt-sub { font-size: 0.8rem; color: #333; }
         
-        /* PHONE VIEW OPTIMIZATIONS */
-        @media (max-width: 900px) { 
-            body { 
-                flex-direction: column; 
-                height: 100vh; 
-                overflow-y: auto; 
-                padding: 10px;
-                gap: 15px;
-            } 
-            .menu-container {
-                flex: none;
-                overflow-y: visible;
-                padding: 15px;
-            }
-            .grid {
-                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-                gap: 10px;
-            }
-            .cart-container { 
-                flex: none;
-                height: auto; 
-                max-height: 600px;
-                padding: 15px;
-            } 
-            .counter-header h2 {
-                font-size: 1.1rem;
-            }
-            .orders-dashboard {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 1100px) {
+            body { flex-direction: column; height: 100vh; overflow-y: auto; padding: 10px; gap: 15px; } 
+            .menu-container, .cart-container { flex: none; width: 100%; height: auto; }
+            .counter-body-wrapper { flex-direction: column; overflow-y: visible; height: auto; }
+            .counter-view { height: auto; overflow-y: visible; }
+            .audit-side, .orders-dashboard { height: 500px; }
+        }
+
+        /* Print Override styles for physical thermal print link */
+        @media print {
+            body * { visibility: hidden; }
+            #receipt-view-modal, #receipt-view-modal * { visibility: visible; }
+            #receipt-view-modal { position: absolute; left: 0; top: 0; width: 100%; background: #fff; display: flex !important; justify-content: center; padding: 0; }
+            .receipt-paper { box-shadow: none; padding: 10px; width: 100%; max-width: 100%; }
+            .modal-footer-btns, #receipt-modal-title-header { display: none !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- CUSTOMER/ORDERING INTERFACE -->
+    <!-- DASHBOARD PROTECTION LOCK OVERLAY -->
+    <div id="lock-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 350px;">
+            <h3>Security Verification</h3>
+            <p style="color: #3ca0c9; font-size: 0.9rem; margin-bottom: 15px;">Enter Admin Password to view Dashboard:</p>
+            <input type="password" id="admin-password-input" style="width: 100%; padding: 12px; font-size: 1.1rem; text-align: center; background: #0e1d25; border: 1px solid #255d7d; color: white; border-radius: 6px; outline: none; margin-bottom: 15px;" placeholder="••••••••" onkeydown="if(event.key === 'Enter') verifyDashboardPassword()">
+            <div class="modal-footer-btns">
+                <button class="btn btn-clear" style="margin:0;" onclick="closeLockModal()">Cancel</button>
+                <button class="btn btn-proceed" style="margin:0;" onclick="verifyDashboardPassword()">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DYNAMIC AUDIT RECEIPT POPUP MODAL -->
+    <div id="receipt-view-modal" class="modal-overlay">
+        <div class="modal-content" style="background: transparent; border: none; box-shadow: none; max-width: 380px; padding: 0;">
+            <h3 id="receipt-modal-title-header" style="color: white; font-family: sans-serif; font-size: 1.2rem; margin-bottom: 12px;">Review Archived Receipt</h3>
+            
+            <div id="receipt-paper-target" class="receipt-paper">
+                <!-- Javascript will inject thermal receipt fields cleanly here -->
+            </div>
+
+            <div class="modal-footer-btns" style="max-width:340px; margin: 15px auto 0 auto;">
+                <button class="btn btn-clear" style="margin:0; flex:1;" onclick="closeReceiptModal()">Close View</button>
+                <button class="btn btn-proceed" style="margin:0; flex:1.2; background-color:#3ca0c9;" onclick="window.print()">Print Receipt</button>
+            </div>
+        </div>
+    </div>
+
     <div id="customer-ui-left" class="menu-container">
         <div class="logo-header">
-            <button class="counter-mode-btn" onclick="toggleInterface()">Counter Login</button>
             <img src="image_dfe6f9.png" alt="H2O Cafe Logo" class="brand-logo" onclick="toggleInterface()">
         </div>
         
@@ -307,7 +344,6 @@
     <div id="customer-ui-right" class="cart-container">
         <div>
             <h2>Current Order</h2>
-            
             <div class="table-selector-container">
                 <label class="table-label" for="table-select">Select Table / Order Type:</label>
                 <select id="table-select" class="table-select">
@@ -345,14 +381,11 @@
         </div>
     </div>
 
-
-    <!-- PAYMENT SELECTION MODAL -->
     <div id="payment-modal" class="modal-overlay">
         <div class="modal-content">
             <h3 id="payment-modal-title">Select Payment Method</h3>
             <p style="color: #3ca0c9; font-weight: bold; font-size: 1.1rem; margin-bottom: 5px;">Total Amount: <span id="modal-total-display">₱0.00</span></p>
             
-            <!-- Selection State -->
             <div id="payment-selection-view" class="payment-options-grid">
                 <button class="btn-pay-choice" onclick="selectPayment('Cash')">
                     💵<br><br>Cash
@@ -362,7 +395,6 @@
                 </button>
             </div>
 
-            <!-- GCash QR Active State -->
             <div id="gcash-qr-view" class="gcash-qr-view">
                 <p style="font-size: 0.9rem; color: #dcdde1;">Please scan the QR code below to complete your payment.</p>
                 <div class="qr-placeholder">
@@ -378,38 +410,128 @@
         </div>
     </div>
 
-
-    <!-- COUNTER DISPATCH LIVE VIEW INTERFACE -->
     <div id="counter-ui" class="counter-view">
         <div class="counter-header">
-            <h2>Live Queue</h2>
+            <h2>H2O Counter Dashboard</h2>
             <button class="btn btn-clear" style="width: auto; padding: 10px 15px; margin: 0;" onclick="toggleInterface()">Back to Menu</button>
         </div>
-        <div id="orders-dashboard" class="orders-dashboard">
-            <!-- Dynamically populated kitchen cards land here -->
+        
+        <div class="counter-body-wrapper">
+            <div class="queue-side">
+                <h3 style="color:#3ca0c9; margin-bottom:10px; font-size:1.1rem; text-transform:uppercase;">Live Processing Queue</h3>
+                <div id="orders-dashboard" class="orders-dashboard"></div>
+            </div>
+            
+            <div class="audit-side">
+                <div class="audit-controls">
+                    <span style="font-weight:bold; color:#3ca0c9; font-size:0.9rem; text-transform:uppercase;">Audit Logs for:</span>
+                    <input type="date" id="audit-date-filter" class="audit-date-picker" onchange="renderAuditLogs()">
+                </div>
+                
+                <div class="audit-metrics">
+                    <div class="metric-card">
+                        <div class="metric-title">Gross Total</div>
+                        <div id="audit-gross-total" class="metric-val">₱0.00</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Cash Total</div>
+                        <div id="audit-cash-total" class="metric-val" style="color:#e67e22;">₱0.00</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">GCash Total</div>
+                        <div id="audit-gcash-total" class="metric-val" style="color:#3498db;">₱0.00</div>
+                    </div>
+                </div>
+                
+                <div class="audit-table-container">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID / Time</th>
+                                <th>Type</th>
+                                <th>Items Ordered</th>
+                                <th>Method</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-rows"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         let activeCart = [];
         let chosenPaymentMethod = "";
+        const ADMIN_PASSWORD = "admin"; 
 
         window.onload = function() {
             if(!localStorage.getItem('h2o_orders')) {
                 localStorage.setItem('h2o_orders', JSON.stringify([]));
             }
+            
+            const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
+            document.getElementById('audit-date-filter').value = localISOTime;
+
             updateReceiptDisplay();
             renderCounterDashboard();
+            renderAuditLogs();
 
             window.addEventListener('storage', (e) => {
                 if (e.key === 'h2o_orders') {
                     renderCounterDashboard();
-                    playNotificationSound();
+                    renderAuditLogs();
                 }
             });
         };
 
-        // --- CUSTOMER INTERFACE FUNCTIONS ---
+        function toggleInterface() {
+            const counterUi = document.getElementById('counter-ui');
+            if(counterUi.style.display === 'flex') {
+                exitDashboardView();
+            } else {
+                openLockModal();
+            }
+        }
+
+        function openLockModal() {
+            document.getElementById('admin-password-input').value = ""; 
+            document.getElementById('lock-modal').style.display = 'flex';
+            setTimeout(() => document.getElementById('admin-password-input').focus(), 100);
+        }
+
+        function closeLockModal() {
+            document.getElementById('lock-modal').style.display = 'none';
+        }
+
+        function verifyDashboardPassword() {
+            const inputVal = document.getElementById('admin-password-input').value;
+            if (inputVal === ADMIN_PASSWORD) {
+                closeLockModal();
+                enterDashboardView();
+            } else {
+                alert("❌ Incorrect passcode. Access Denied!");
+                document.getElementById('admin-password-input').value = "";
+                document.getElementById('admin-password-input').focus();
+            }
+        }
+
+        function enterDashboardView() {
+            document.getElementById('counter-ui').style.display = 'flex';
+            document.getElementById('customer-ui-left').style.display = 'none';
+            document.getElementById('customer-ui-right').style.display = 'none';
+            renderCounterDashboard();
+            renderAuditLogs();
+        }
+
+        function exitDashboardView() {
+            document.getElementById('counter-ui').style.display = 'none';
+            document.getElementById('customer-ui-left').style.display = 'block';
+            document.getElementById('customer-ui-right').style.display = 'flex';
+        }
+
         function addToOrder(name, price) {
             let existingItem = activeCart.find(item => item.name === name);
             if (existingItem) {
@@ -432,6 +554,7 @@
         function updateReceiptDisplay() {
             const cartList = document.getElementById('cart-items');
             const totalDisplay = document.getElementById('total-amount');
+            if(!cartList) return;
             
             cartList.innerHTML = '';
             let total = 0;
@@ -465,7 +588,6 @@
             updateReceiptDisplay();
         }
 
-        // --- PAYMENT OVERLAY FLOW CONTROLLERS ---
         function openPaymentModal() {
             if (activeCart.length === 0) {
                 alert(`Your order is empty. Select items from the menu first!`);
@@ -491,7 +613,6 @@
 
         function selectPayment(method) {
             chosenPaymentMethod = method;
-            
             if (method === 'Cash') {
                 executeOrderSubmission();
             } else if (method === 'GCash') {
@@ -499,236 +620,230 @@
                 document.getElementById('payment-selection-view').style.display = 'none';
                 document.getElementById('gcash-qr-view').style.display = 'block';
                 document.getElementById('btn-modal-close').style.display = 'block';
-                
-                const doneBtn = document.getElementById('btn-modal-done');
-                doneBtn.style.display = 'block';
+                document.getElementById('btn-modal-done').style.display = 'block';
             }
         }
 
-        // --- SUBMIT COMPONENT ---
         function executeOrderSubmission() {
-            const targetTable = document.getElementById('table-select').value;
-            const database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+            const tableSelected = document.getElementById('table-select').value;
+            let total = 0;
+            activeCart.forEach(item => total += (item.price * item.quantity));
 
-            const newOrder = {
-                id: 'H2O-' + Date.now(),
-                table: targetTable,
-                timestamp: new Date().toLocaleString(),
-                items: [...activeCart],
-                paymentMethod: chosenPaymentMethod, 
-                status: 'pending' 
+            const orderId = "H2O-" + Date.now().toString().slice(-6);
+            const timeString = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+            const dateString = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
+
+            // Deep array copy preserves structural objects inside history profile arrays
+            const savedCartSnapshot = JSON.parse(JSON.stringify(activeCart));
+
+            const newOrderObj = {
+                id: orderId,
+                date: dateString,
+                time: timeString,
+                type: tableSelected,
+                cartData: savedCartSnapshot,
+                method: chosenPaymentMethod,
+                total: total,
+                status: 'pending'
             };
 
-            database.push(newOrder);
-            localStorage.setItem('h2o_orders', JSON.stringify(database));
+            let currentOrders = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+            currentOrders.push(newOrderObj);
+            localStorage.setItem('h2o_orders', JSON.stringify(currentOrders));
 
-            alert(`Order successfully submitted to the Counter! Payment tagged as: [${chosenPaymentMethod}].`);
+            alert(`🎉 Order Created Successfully!\nID: ${orderId}\nTotal: ₱${total.toFixed(2)}`);
             
             closePaymentModal();
             clearOrder();
-            renderCounterDashboard(); 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            renderCounterDashboard();
+            renderAuditLogs();
         }
 
-
-        // --- COUNTER LOGIC CONTROLLERS ---
         function renderCounterDashboard() {
             const dashboard = document.getElementById('orders-dashboard');
             if(!dashboard) return;
             
-            const database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
-            dashboard.innerHTML = '';
-
-            if(database.length === 0) {
-                dashboard.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #3ca0c9; font-size: 1.2rem; padding: 40px;">No incoming transactions yet.</p>`;
+            dashboard.innerHTML = "";
+            let currentOrders = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+            let activeQueueOrders = currentOrders.filter(o => o.status === 'pending' || o.status === 'preparing');
+            
+            if(activeQueueOrders.length === 0) {
+                dashboard.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #8a9bb4; padding: 20px;">No active processing orders found.</p>`;
                 return;
             }
 
-            database.slice().reverse().forEach(order => {
-                let orderTotal = 0;
-                let itemsListHtml = '';
-
-                order.items.forEach(item => {
-                    const lineTotal = item.price * item.quantity;
-                    orderTotal += lineTotal;
-                    itemsListHtml += `<li style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                        <span>${item.quantity}x ${item.name}</span>
-                        <span>₱${lineTotal.toFixed(2)}</span>
-                    </li>`;
-                });
-
-                // Status configuration based on Payment Mode
-                let statusLabel = "";
-                let statusColor = "";
-                
-                if (order.paymentMethod === 'GCash') {
-                    statusLabel = "PAID VIA GCash";
-                    statusColor = "#2980b9"; 
-                } else {
-                    statusLabel = "PAY USING CASH";
-                    statusColor = "#e67e22"; 
-                }
-
+            activeQueueOrders.forEach((order) => {
                 const card = document.createElement('div');
                 card.className = `order-pane ${order.status}`;
+                
+                // Maps item array lines onto human readable summaries cleanly
+                const listItemsString = order.cartData ? order.cartData.map(i => `${i.quantity}x ${i.name}`).join(', ') : 'No Item Records';
+
                 card.innerHTML = `
-                    <div>
-                        <!-- FIXED LAYOUT CLUSTER TO PREVENT OVERLAP -->
-                        <div class="card-top-header">
-                            <h3 style="color:#fff; margin: 0;">${order.table}</h3>
-                            <div class="card-badge-cluster">
-                                <span class="status-lifecycle-badge badge-${order.status}">${order.status}</span>
-                                <span class="payment-label-badge" style="background: ${statusColor};">${statusLabel}</span>
-                            </div>
+                    <div class="card-top-header">
+                        <div>
+                            <strong style="color:#fff; font-size:1.05rem;">${order.id}</strong>
+                            <div style="font-size:0.75rem; color:#8a9bb4; margin-top:2px;">${order.time} - ${order.type}</div>
                         </div>
-                        <small style="color:#3ca0c9; display:block; margin-top:6px;">ID: ${order.id}</small>
-                        <small style="color:#3ca0c9; display:block; margin-bottom:5px;">${order.timestamp}</small>
-                        <ul class="order-pane-items">${itemsListHtml}</ul>
-                        <div style="display:flex; justify-content:space-between; font-weight:bold; color:#4cd137; margin:5px 0;">
-                            <span>Total:</span><span>₱${orderTotal.toFixed(2)}</span>
+                        <div class="card-badge-cluster">
+                            <span class="payment-label-badge" style="background:${order.method === 'GCash' ? '#3498db':'#e67e22'}">${order.method}</span>
+                            <span class="status-lifecycle-badge badge-${order.status}">${order.status}</span>
                         </div>
                     </div>
+                    <ul class="order-pane-items">
+                        <li style="font-size:0.88rem; color:#dcdde1; line-height:1.4;">${listItemsString}</li>
+                    </ul>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:#4cd137; font-weight:bold; font-size:1.1rem;">₱${Number(order.total).toFixed(2)}</span>
+                    </div>
                     <div class="pane-actions">
-                        ${order.status === 'pending' ? `<button class="btn-pane btn-prep" onclick="updateStatus('${order.id}', 'preparing')">Prepare</button>` : ''}
-                        ${order.status === 'preparing' ? `<button class="btn-pane btn-comp" onclick="updateStatus('${order.id}', 'completed')">Complete</button>` : ''}
-                        <button class="btn-pane btn-print" onclick="printReceiptFromCounter('${order.id}')">Print</button>
-                        <button class="btn-pane btn-del" onclick="deleteOrderRecord('${order.id}')">Delete</button>
+                        ${order.status === 'pending' ? `<button class="btn-pane btn-prep" onclick="updateOrderStatus('${order.id}', 'preparing')">Prep</button>` : ''}
+                        ${order.status === 'preparing' ? `<button class="btn-pane btn-comp" onclick="updateOrderStatus('${order.id}', 'completed')">Done</button>` : ''}
+                        <button class="btn-pane btn-del" onclick="deleteOrderRecord('${order.id}')">Remove</button>
                     </div>
                 `;
                 dashboard.appendChild(card);
             });
         }
 
-        function updateStatus(orderId, newStatus) {
-            let database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
-            let order = database.find(o => o.id === orderId);
-            if(order) {
-                order.status = newStatus;
-                localStorage.setItem('h2o_orders', JSON.stringify(database));
+        function updateOrderStatus(id, newStatus) {
+            let currentOrders = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+            let target = currentOrders.find(o => o.id === id);
+            if(target) {
+                target.status = newStatus;
+                localStorage.setItem('h2o_orders', JSON.stringify(currentOrders));
                 renderCounterDashboard();
+                renderAuditLogs();
             }
         }
 
-        function deleteOrderRecord(orderId) {
-            if(confirm("Are you sure you want to completely remove this order entry?")) {
-                let database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
-                database = database.filter(o => o.id !== orderId);
-                localStorage.setItem('h2o_orders', JSON.stringify(database));
+        function deleteOrderRecord(id) {
+            if(confirm("Are you sure you want to completely remove this order record? This will remove it from both the queue and your audit sales log!")) {
+                let currentOrders = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+                currentOrders = currentOrders.filter(o => o.id !== id);
+                localStorage.setItem('h2o_orders', JSON.stringify(currentOrders));
                 renderCounterDashboard();
+                renderAuditLogs();
             }
         }
 
-        function printReceiptFromCounter(orderId) {
-            let database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
-            let order = database.find(o => o.id === orderId);
-            if(!order) return;
+        function renderAuditLogs() {
+            const selectedDate = document.getElementById('audit-date-filter').value;
+            const tableRows = document.getElementById('audit-rows');
+            if(!tableRows) return;
 
-            let total = 0;
-            let receiptRows = '';
-            
-            order.items.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                receiptRows += `
-                    <tr>
-                        <td style="padding: 5px 0;">${item.quantity}x ${item.name}</td>
-                        <td style="text-align: right; padding: 5px 0;">₱${itemTotal.toFixed(2)}</td>
-                    </tr>
+            tableRows.innerHTML = "";
+            let currentOrders = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+            let filtered = currentOrders.filter(o => o.date === selectedDate);
+
+            let gross = 0;
+            let cashSum = 0;
+            let gcashSum = 0;
+
+            filtered.forEach(o => {
+                gross += o.total;
+                if(o.method === 'Cash') cashSum += o.total;
+                if(o.method === 'GCash') gcashSum += o.total;
+
+                const tr = document.createElement('tr');
+                tr.className = "clickable-row";
+                tr.onclick = () => openReceiptModal(o.id);
+
+                const listItemsString = o.cartData ? o.cartData.map(i => `${i.quantity}x ${i.name}`).join(', ') : 'No Item Records';
+                const isFinishedStyle = o.status === 'completed' ? 'style="opacity: 0.65;"' : '';
+                
+                tr.innerHTML = `
+                    <td ${isFinishedStyle}><strong>${o.id}</strong><br><span style="color:#8a9bb4; font-size:0.75rem;">${o.time}</span></td>
+                    <td ${isFinishedStyle}><span style="color:#3ca0c9; font-weight:500;">${o.type}</span></td>
+                    <td style="max-width:200px; white-space:normal; font-size:0.8rem; color:#b2bec3; ${o.status === 'completed' ? 'text-decoration: line-through;' : ''}">${listItemsString}</td>
+                    <td ${isFinishedStyle}><span style="color:${o.method === 'GCash'?'#3498db':'#e67e22'}; font-weight:bold;">${o.method}</span></td>
+                    <td ${isFinishedStyle}><strong style="color:#4cd137;">₱${Number(o.total).toFixed(2)}</strong></td>
                 `;
+                tableRows.appendChild(tr);
             });
 
-            const receiptStatusText = order.paymentMethod === 'GCash' ? 'PAID VIA GCASH' : 'COLLECT CASH';
-
-            const printWindow = window.open('', '_blank', 'height=600,width=400');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Receipt - ${order.table}</title>
-                    <style>
-                        body { font-family: 'Courier New', Courier, monospace; color: #000; padding: 20px; width: 300px; margin: 0 auto; }
-                        .text-center { text-align: center; }
-                        .separator { border-top: 1px dashed #000; margin: 10px 0; }
-                        table { width: 100%; border-collapse: collapse; }
-                        .total-row { font-weight: bold; font-size: 1.2rem; }
-                    </style>
-                </head>
-                <body>
-                    <h2 class="text-center">H2O CAFE</h2>
-                    <p class="text-center" style="font-size: 0.9rem;">& PICA-PICA POS</p>
-                    <div class="separator"></div>
-                    <p><strong>Type/Table:</strong> ${order.table}</p>
-                    <p><strong>Payment Status:</strong> ${receiptStatusText}</p>
-                    <p><strong>ID:</strong> ${order.id}</p>
-                    <p><strong>Date:</strong> ${order.timestamp}</p>
-                    <div class="separator"></div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="text-align: left;">Item</th>
-                                <th style="text-align: right;">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            \${receiptRows}
-                        </tbody>
-                    </table>
-                    <div class="separator"></div>
-                    <div class="total-row">
-                        <span style="float: left;">TOTAL:</span>
-                        <span style="float: right;">₱\${total.toFixed(2)}</span>
-                    </div>
-                    <div style="clear: both;"></div>
-                    <div class="separator"></div>
-                    <p class="text-center" style="margin-top: 20px; font-size: 0.9rem;">Thank you! Come again.</p>
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                            window.close();
-                        };
-                    <\/script>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
+            document.getElementById('audit-gross-total').innerText = `₱${gross.toFixed(2)}`;
+            document.getElementById('audit-cash-total').innerText = `₱${cashSum.toFixed(2)}`;
+            document.getElementById('audit-gcash-total').innerText = `₱${gcashSum.toFixed(2)}`;
         }
 
-        function toggleInterface() {
-            const leftUI = document.getElementById('customer-ui-left');
-            const rightUI = document.getElementById('customer-ui-right');
-            const counterUI = document.getElementById('counter-ui');
+        // --- NEW: RECEIPT VIEW MODAL FLOW LOGIC ---
+        function openReceiptModal(orderId) {
+            let currentOrders = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+            let order = currentOrders.find(o => o.id === orderId);
+            if(!order) return;
 
-            if(counterUI.style.display === 'flex') {
-                counterUI.style.display = 'none';
-                leftUI.style.display = 'block';
-                rightUI.style.display = 'flex';
+            const paperTarget = document.getElementById('receipt-paper-target');
+            
+            // Build items block
+            let itemsHtml = "";
+            if (order.cartData && order.cartData.length > 0) {
+                order.cartData.forEach(item => {
+                    let itemTotal = item.price * item.quantity;
+                    itemsHtml += `
+                        <div class="receipt-row">
+                            <span>${item.quantity}x ${item.name}</span>
+                            <span>₱${itemTotal.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
             } else {
-                const password = prompt("Enter counter access authorization pin:");
-                if(password === '013023' || password === '') {
-                    leftUI.style.display = 'none';
-                    rightUI.style.display = 'none';
-                    counterUI.style.display = 'flex';
-                    renderCounterDashboard();
-                } else {
-                    alert("Incorrect Pin Code Access Denied!");
-                }
+                itemsHtml = `<div class="receipt-row"><span>Legacy Log Entry</span><span>₱${Number(order.total).toFixed(2)}</span></div>`;
             }
+
+            paperTarget.innerHTML = `
+                <div class="receipt-center">
+                    <div class="receipt-title">H2O CAFE</div>
+                    <div class="receipt-sub">Zamboanga City, PH</div>
+                    <div class="receipt-sub">POS Sales History Audit</div>
+                </div>
+                
+                <div class="receipt-row">
+                    <span>Order Reference:</span>
+                    <strong>${order.id}</strong>
+                </div>
+                <div class="receipt-row">
+                    <span>Date / Time:</span>
+                    <span>${order.date} @ ${order.time}</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Service Block:</span>
+                    <span>${order.type}</span>
+                </div>
+                <div class="receipt-row">
+                    <span>System Status:</span>
+                    <span style="text-transform: uppercase; font-weight: bold;">${order.status}</span>
+                </div>
+                
+                <div class="receipt-divider"></div>
+                
+                <div style="font-weight: bold; margin-bottom: 8px; font-size: 0.85rem;">ITEMS ORDERED:</div>
+                ${itemsHtml}
+                
+                <div class="receipt-divider"></div>
+                
+                <div class="receipt-row" style="font-size: 1.1rem; font-weight: bold;">
+                    <span>GRAND TOTAL:</span>
+                    <span>₱${Number(order.total).toFixed(2)}</span>
+                </div>
+                <div class="receipt-row" style="font-size: 0.85rem; margin-top: 4px;">
+                    <span>Payment Mode:</span>
+                    <span>${order.method}</span>
+                </div>
+                
+                <div class="receipt-divider" style="margin-top:20px;"></div>
+                <div class="receipt-center" style="font-size: 0.75rem; margin-bottom: 0; color: #555;">
+                    * Thank you for stopping by! *
+                </div>
+            `;
+
+            document.getElementById('receipt-view-modal').style.display = 'flex';
         }
 
-        function playNotificationSound() {
-            try {
-                const context = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = context.createOscillator();
-                const gain = context.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, context.currentTime);
-                osc.frequency.setValueAtTime(880, context.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.3, context.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.4);
-                osc.connect(gain);
-                gain.connect(context.destination);
-                osc.start();
-                osc.stop(context.currentTime + 0.4);
-            } catch(e) { console.log("Audio notification failed to fire."); }
+        function closeReceiptModal() {
+            document.getElementById('receipt-view-modal').style.display = 'none';
         }
     </script>
 </body>
