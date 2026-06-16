@@ -29,10 +29,15 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
         
         /* Menu Item Cards */
-        .item-card { background: #1a445c; border: 1px solid #255d7d; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; min-height: 100px; }
+        .item-card { background: #1a445c; border: 1px solid #255d7d; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; min-height: 100px; position: relative; }
         .item-card:hover { transform: translateY(-3px); border-color: #4cd137; box-shadow: 0 4px 12px rgba(76, 209, 55, 0.3); background: #1f526e; }
         .item-name { font-weight: 600; color: #fff; font-size: 0.95rem; }
         .item-price { color: #4cd137; font-weight: bold; margin-top: 5px; font-size: 1rem; }
+
+        /* Out of Stock Styling */
+        .item-card.out-of-stock { opacity: 0.4; cursor: not-allowed; border-color: #e84118; }
+        .item-card.out-of-stock:hover { transform: none; box-shadow: none; background: #1a445c; border-color: #e84118; }
+        .stock-status { color: #e84118; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-top: 5px; letter-spacing: 0.5px; }
 
         /* Right Side: POS Receipt Cart */
         .cart-container { flex: 1; background: #0e1d25; color: white; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.4); border: 1px solid #1a3442; overflow: hidden; }
@@ -71,22 +76,49 @@
         .counter-view { display: none; width: 100%; height: 100%; background: #0b2533; flex-direction: column; padding: 10px; overflow: hidden; }
         .counter-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #3ca0c9; padding-bottom: 15px; margin-bottom: 15px; gap: 10px; }
         .orders-dashboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; overflow-y: auto; flex-grow: 1; padding-bottom: 20px; }
+        
+        /* Cleaned Up Order Card Container Setup */
         .order-pane { background: #123446; border: 2px solid #255d7d; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         .order-pane.pending { border-color: #f1c40f; }
         .order-pane.preparing { border-color: #3ca0c9; }
         .order-pane.completed { border-color: #2ecc71; opacity: 0.7; }
-        .order-badge { position: absolute; top: 10px; right: 10px; padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        
+        /* Fixed Badge Alignment Layout Block */
+        .card-top-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #255d7d; padding-bottom: 8px; gap: 8px; }
+        .card-badge-cluster { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+        
+        .payment-label-badge { color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; }
+        .status-lifecycle-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; }
+        
         .badge-pending { background: #f1c40f; color: #000; }
         .badge-preparing { background: #3ca0c9; color: #fff; }
         .badge-completed { background: #2ecc71; color: #fff; }
         
-        .order-pane-items { list-style: none; margin: 10px 0; border-top: 1px dashed #255d7d; border-bottom: 1px dashed #255d7d; padding: 10px 0; flex-grow: 1; }
+        .order-pane-items { list-style: none; margin: 10px 0; border-bottom: 1px dashed #255d7d; padding-bottom: 10px; flex-grow: 1; }
         .pane-actions { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
         .btn-pane { flex: 1; min-width: 65px; padding: 10px 5px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
         .btn-prep { background: #3498db; color: #fff; }
         .btn-comp { background: #2ecc71; color: #fff; }
         .btn-print { background: #95a5a6; color: #fff; }
         .btn-del { background: #e74c3c; color: #fff; }
+
+        /* PAYMENT MODAL STYLES */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #123446; width: 100%; max-width: 420px; border-radius: 12px; border: 2px solid #3ca0c9; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-content h3 { margin-bottom: 15px; font-size: 1.4rem; color: #fff; }
+        .payment-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        .btn-pay-choice { padding: 20px; font-size: 1.1rem; border-radius: 8px; border: 2px solid #255d7d; background: #1a445c; color: white; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+        .btn-pay-choice:hover { border-color: #4cd137; background: #1f526e; }
+        
+        .gcash-qr-view { display: none; margin-top: 15px; }
+        .qr-placeholder { width: 220px; height: 220px; background: white; margin: 15px auto; border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .qr-placeholder img { width: 100%; height: 100%; object-fit: contain; }
+        
+        .modal-footer-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-modal-close { background: #e84118; color: white; }
+        .btn-modal-close:hover { background: #c23616; }
+        .btn-modal-done { background: #4cd137; color: white; display: none; width: 100%; }
+        .btn-modal-done:hover { background: #44bd32; }
         
         /* PHONE VIEW OPTIMIZATIONS */
         @media (max-width: 900px) { 
@@ -226,8 +258,9 @@
 
         <div class="section-title">H2O Pica-Pica & Rice</div>
         <div class="grid">
-            <div class="item-card" onclick="addToOrder('Chicken Fillet with Rice', 85)">
+            <div class="item-card out-of-stock">
                 <div class="item-name">Chicken Fillet with Rice</div><div class="item-price">₱85</div>
+                <div class="stock-status">Out of Stock</div>
             </div>
             <div class="item-card" onclick="addToOrder('Chicken Lumpia (3pcs)', 20)">
                 <div class="item-name">Chicken Lumpia (3pcs)</div><div class="item-price">₱20</div>
@@ -250,11 +283,13 @@
             <div class="item-card" onclick="addToOrder('French Fries (Share)', 80)">
                 <div class="item-name">French Fries (Share)</div><div class="item-price">₱80</div>
             </div>
-            <div class="item-card" onclick="addToOrder('Siopao Ubebao', 20)">
+            <div class="item-card out-of-stock">
                 <div class="item-name">Siopao Ubebao</div><div class="item-price">₱20</div>
+                <div class="stock-status">Out of Stock</div>
             </div>
-            <div class="item-card" onclick="addToOrder('Siopao Asado', 20)">
+            <div class="item-card out-of-stock">
                 <div class="item-name">Siopao Asado</div><div class="item-price">₱20</div>
+                <div class="stock-status">Out of Stock</div>
             </div>
             <div class="item-card" onclick="addToOrder('Hotdog Sandwich (Reg)', 30)">
                 <div class="item-name">Hotdog Sandwich (Reg)</div><div class="item-price">₱30</div>
@@ -262,8 +297,9 @@
             <div class="item-card" onclick="addToOrder('Hotdog Sandwich w/ Cheese', 35)">
                 <div class="item-name">Hotdog Sandwich w/ Cheese</div><div class="item-price">₱35</div>
             </div>
-            <div class="item-card" onclick="addToOrder('Kwek Kwek (3pcs)', 20)">
+            <div class="item-card out-of-stock">
                 <div class="item-name">Kwek Kwek (3pcs)</div><div class="item-price">₱20</div>
+                <div class="stock-status">Out of Stock</div>
             </div>
         </div>
     </div>
@@ -303,8 +339,41 @@
             </div>
             
             <div class="action-buttons">
-                <button class="btn btn-proceed" onclick="sendOrderToCounter()">Send Order to Counter</button>
+                <button class="btn btn-proceed" onclick="openPaymentModal()">Proceed to Checkout</button>
                 <button class="btn btn-clear" onclick="clearOrder()">Clear Order</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- PAYMENT SELECTION MODAL -->
+    <div id="payment-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="payment-modal-title">Select Payment Method</h3>
+            <p style="color: #3ca0c9; font-weight: bold; font-size: 1.1rem; margin-bottom: 5px;">Total Amount: <span id="modal-total-display">₱0.00</span></p>
+            
+            <!-- Selection State -->
+            <div id="payment-selection-view" class="payment-options-grid">
+                <button class="btn-pay-choice" onclick="selectPayment('Cash')">
+                    💵<br><br>Cash
+                </button>
+                <button class="btn-pay-choice" onclick="selectPayment('GCash')">
+                    📱<br><br>GCash
+                </button>
+            </div>
+
+            <!-- GCash QR Active State -->
+            <div id="gcash-qr-view" class="gcash-qr-view">
+                <p style="font-size: 0.9rem; color: #dcdde1;">Please scan the QR code below to complete your payment.</p>
+                <div class="qr-placeholder">
+                    <img src="gcash_qr.png" alt="GCash QR Code View" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=H2OCafePayment';">
+                </div>
+                <p style="font-size: 0.85rem; color: #f1c40f; margin-bottom: 10px;">⚠️ Take a screenshot or secure your receipt reference!</p>
+            </div>
+
+            <div class="modal-footer-btns">
+                <button id="btn-modal-close" class="btn btn-clear btn-modal-close" onclick="closePaymentModal()">Cancel</button>
+                <button id="btn-modal-done" class="btn btn-proceed btn-modal-done" onclick="executeOrderSubmission()">Done Paying & Send</button>
             </div>
         </div>
     </div>
@@ -322,10 +391,9 @@
     </div>
 
     <script>
-        // Active memory for local cart checkout 
         let activeCart = [];
+        let chosenPaymentMethod = "";
 
-        // App Initializer & Real-time cross-tab tracking
         window.onload = function() {
             if(!localStorage.getItem('h2o_orders')) {
                 localStorage.setItem('h2o_orders', JSON.stringify([]));
@@ -333,7 +401,6 @@
             updateReceiptDisplay();
             renderCounterDashboard();
 
-            // Event listener watches localstorage events across other browser tabs/windows seamlessly
             window.addEventListener('storage', (e) => {
                 if (e.key === 'h2o_orders') {
                     renderCounterDashboard();
@@ -398,34 +465,69 @@
             updateReceiptDisplay();
         }
 
-        // --- SUBMIT COMPONENT (CUSTOMER TO STORAGE) ---
-        function sendOrderToCounter() {
+        // --- PAYMENT OVERLAY FLOW CONTROLLERS ---
+        function openPaymentModal() {
             if (activeCart.length === 0) {
                 alert(`Your order is empty. Select items from the menu first!`);
                 return;
             }
+            
+            let total = 0;
+            activeCart.forEach(item => total += (item.price * item.quantity));
+            
+            document.getElementById('modal-total-display').innerText = `₱${total.toFixed(2)}`;
+            document.getElementById('payment-modal-title').innerText = "Select Payment Method";
+            document.getElementById('payment-selection-view').style.display = 'grid';
+            document.getElementById('gcash-qr-view').style.display = 'none';
+            document.getElementById('btn-modal-close').style.display = 'block';
+            document.getElementById('btn-modal-done').style.display = 'none';
+            document.getElementById('payment-modal').style.display = 'flex';
+        }
 
+        function closePaymentModal() {
+            document.getElementById('payment-modal').style.display = 'none';
+            chosenPaymentMethod = "";
+        }
+
+        function selectPayment(method) {
+            chosenPaymentMethod = method;
+            
+            if (method === 'Cash') {
+                executeOrderSubmission();
+            } else if (method === 'GCash') {
+                document.getElementById('payment-modal-title').innerText = "Pay via GCash Portal";
+                document.getElementById('payment-selection-view').style.display = 'none';
+                document.getElementById('gcash-qr-view').style.display = 'block';
+                document.getElementById('btn-modal-close').style.display = 'block';
+                
+                const doneBtn = document.getElementById('btn-modal-done');
+                doneBtn.style.display = 'block';
+            }
+        }
+
+        // --- SUBMIT COMPONENT ---
+        function executeOrderSubmission() {
             const targetTable = document.getElementById('table-select').value;
             const database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
 
-            // Compile localized receipt structure
             const newOrder = {
                 id: 'H2O-' + Date.now(),
                 table: targetTable,
                 timestamp: new Date().toLocaleString(),
                 items: [...activeCart],
-                status: 'pending' // pending -> preparing -> completed
+                paymentMethod: chosenPaymentMethod, 
+                status: 'pending' 
             };
 
             database.push(newOrder);
             localStorage.setItem('h2o_orders', JSON.stringify(database));
 
-            alert(`Order successfully submitted to the Counter! Please wait while we process your request.`);
+            alert(`Order successfully submitted to the Counter! Payment tagged as: [${chosenPaymentMethod}].`);
             
-            // Clean interface slate for next customer
+            closePaymentModal();
             clearOrder();
             renderCounterDashboard(); 
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll back to top for user convenience
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
 
@@ -442,7 +544,6 @@
                 return;
             }
 
-            // Map dynamically reverse ordered to keep cutting edge records up top
             database.slice().reverse().forEach(order => {
                 let orderTotal = 0;
                 let itemsListHtml = '';
@@ -456,13 +557,31 @@
                     </li>`;
                 });
 
+                // Status configuration based on Payment Mode
+                let statusLabel = "";
+                let statusColor = "";
+                
+                if (order.paymentMethod === 'GCash') {
+                    statusLabel = "PAID VIA GCash";
+                    statusColor = "#2980b9"; 
+                } else {
+                    statusLabel = "PAY USING CASH";
+                    statusColor = "#e67e22"; 
+                }
+
                 const card = document.createElement('div');
                 card.className = `order-pane ${order.status}`;
                 card.innerHTML = `
-                    <span class="order-badge badge-${order.status}">${order.status}</span>
                     <div>
-                        <h3 style="color:#fff; border-bottom:1px solid #255d7d; padding-bottom:5px;">${order.table}</h3>
-                        <small style="color:#3ca0c9; display:block; margin-top:2px;">ID: ${order.id}</small>
+                        <!-- FIXED LAYOUT CLUSTER TO PREVENT OVERLAP -->
+                        <div class="card-top-header">
+                            <h3 style="color:#fff; margin: 0;">${order.table}</h3>
+                            <div class="card-badge-cluster">
+                                <span class="status-lifecycle-badge badge-${order.status}">${order.status}</span>
+                                <span class="payment-label-badge" style="background: ${statusColor};">${statusLabel}</span>
+                            </div>
+                        </div>
+                        <small style="color:#3ca0c9; display:block; margin-top:6px;">ID: ${order.id}</small>
                         <small style="color:#3ca0c9; display:block; margin-bottom:5px;">${order.timestamp}</small>
                         <ul class="order-pane-items">${itemsListHtml}</ul>
                         <div style="display:flex; justify-content:space-between; font-weight:bold; color:#4cd137; margin:5px 0;">
@@ -499,7 +618,6 @@
             }
         }
 
-        // --- DYNAMIC SLIT RECEIPT EMULATOR PRINT ---
         function printReceiptFromCounter(orderId) {
             let database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
             let order = database.find(o => o.id === orderId);
@@ -519,6 +637,8 @@
                 `;
             });
 
+            const receiptStatusText = order.paymentMethod === 'GCash' ? 'PAID VIA GCASH' : 'COLLECT CASH';
+
             const printWindow = window.open('', '_blank', 'height=600,width=400');
             printWindow.document.write(`
                 <html>
@@ -537,6 +657,7 @@
                     <p class="text-center" style="font-size: 0.9rem;">& PICA-PICA POS</p>
                     <div class="separator"></div>
                     <p><strong>Type/Table:</strong> ${order.table}</p>
+                    <p><strong>Payment Status:</strong> ${receiptStatusText}</p>
                     <p><strong>ID:</strong> ${order.id}</p>
                     <p><strong>Date:</strong> ${order.timestamp}</p>
                     <div class="separator"></div>
@@ -548,13 +669,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${receiptRows}
+                            \${receiptRows}
                         </tbody>
                     </table>
                     <div class="separator"></div>
                     <div class="total-row">
                         <span style="float: left;">TOTAL:</span>
-                        <span style="float: right;">₱${total.toFixed(2)}</span>
+                        <span style="float: right;">₱\${total.toFixed(2)}</span>
                     </div>
                     <div style="clear: both;"></div>
                     <div class="separator"></div>
@@ -571,7 +692,6 @@
             printWindow.document.close();
         }
 
-        // --- APP SYSTEM MANAGEMENT TOOLS ---
         function toggleInterface() {
             const leftUI = document.getElementById('customer-ui-left');
             const rightUI = document.getElementById('customer-ui-right');
@@ -582,9 +702,8 @@
                 leftUI.style.display = 'block';
                 rightUI.style.display = 'flex';
             } else {
-                // Prompt authentication protocol guard for counter entrance
                 const password = prompt("Enter counter access authorization pin:");
-                if(password === '013023' || password === '') { // Leave blank or type '1234'
+                if(password === '1234' || password === '') {
                     leftUI.style.display = 'none';
                     rightUI.style.display = 'none';
                     counterUI.style.display = 'flex';
@@ -601,8 +720,8 @@
                 const osc = context.createOscillator();
                 const gain = context.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, context.currentTime); // D5 Note
-                osc.frequency.setValueAtTime(880, context.currentTime + 0.15); // A5 Note
+                osc.frequency.setValueAtTime(587.33, context.currentTime);
+                osc.frequency.setValueAtTime(880, context.currentTime + 0.15);
                 gain.gain.setValueAtTime(0.3, context.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.4);
                 osc.connect(gain);
