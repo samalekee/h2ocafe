@@ -6,14 +6,14 @@
     <title>H2O Cafe & Pica-Pica POS</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { display: flex; background-color: #0b2533; color: #fff; height: 100vh; padding: 20px; gap: 20px; }
+        body { display: flex; background-color: #0b2533; color: #fff; height: 100vh; padding: 20px; gap: 20px; overflow: hidden; }
         
         /* Left Side: Menu Grid */
         .menu-container { flex: 2; overflow-y: auto; background: #123446; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         
         /* Centered Logo Styling */
-        .logo-header { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #3ca0c9; }
-        .brand-logo { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.4); border: 2px solid #3ca0c9; }
+        .logo-header { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #3ca0c9; position: relative; }
+        .brand-logo { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.4); border: 2px solid #3ca0c9; cursor: pointer; }
         
         h2 { margin-bottom: 15px; color: #fff; text-align: center; }
         .section-title { font-size: 1.1rem; color: #3ca0c9; margin: 25px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #3ca0c9; padding-left: 10px; font-weight: bold; }
@@ -55,15 +55,39 @@
         
         .btn-clear { background-color: #e84118; color: white; padding: 8px; font-size: 0.9rem; }
         .btn-clear:hover { background-color: #c23616; }
+
+        /* Counter View Mode Styles */
+        .counter-mode-btn { position: absolute; left: 10px; top: 10px; background: #255d7d; color: #fff; padding: 5px 10px; font-size: 0.75rem; border: none; border-radius: 4px; cursor: pointer; }
+        .counter-view { display: none; width: 100%; height: 100%; background: #0b2533; flex-direction: column; padding: 10px; }
+        .counter-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #3ca0c9; padding-bottom: 15px; margin-bottom: 15px; }
+        .orders-dashboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; overflow-y: auto; flex-grow: 1; }
+        .order-pane { background: #123446; border: 2px solid #255d7d; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .order-pane.pending { border-color: #f1c40f; }
+        .order-pane.preparing { border-color: #3ca0c9; }
+        .order-pane.completed { border-color: #2ecc71; opacity: 0.7; }
+        .order-badge { position: absolute; top: 10px; right: 10px; padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        .badge-pending { background: #f1c40f; color: #000; }
+        .badge-preparing { background: #3ca0c9; color: #fff; }
+        .badge-completed { background: #2ecc71; color: #fff; }
         
-        @media (max-width: 768px) { body { flex-direction: column; height: auto; } .cart-container { height: 550px; } }
+        .order-pane-items { list-style: none; margin: 10px 0; border-top: 1px dashed #255d7d; border-bottom: 1px dashed #255d7d; padding: 10px 0; flex-grow: 1; }
+        .pane-actions { display: flex; gap: 5px; margin-top: 10px; }
+        .btn-pane { flex: 1; padding: 8px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+        .btn-prep { background: #3498db; color: #fff; }
+        .btn-comp { background: #2ecc71; color: #fff; }
+        .btn-print { background: #95a5a6; color: #fff; }
+        .btn-del { background: #e74c3c; color: #fff; }
+        
+        @media (max-width: 768px) { body { flex-direction: column; height: auto; overflow: auto; } .cart-container { height: 550px; } }
     </style>
 </head>
 <body>
 
-    <div class="menu-container">
+    <!-- CUSTOMER/ORDERING INTERFACE -->
+    <div id="customer-ui-left" class="menu-container">
         <div class="logo-header">
-            <img src="image_dfe6f9.png" alt="H2O Cafe Logo" class="brand-logo">
+            <button class="counter-mode-btn" onclick="toggleInterface()">Counter Login</button>
+            <img src="image_dfe6f9.png" alt="H2O Cafe Logo" class="brand-logo" onclick="toggleInterface()">
         </div>
         
         <div class="section-title">Iced Coffee</div>
@@ -204,13 +228,13 @@
         </div>
     </div>
 
-    <div class="cart-container">
+    <div id="customer-ui-right" class="cart-container">
         <div>
             <h2>Current Order</h2>
             
             <div class="table-selector-container">
                 <label class="table-label" for="table-select">Select Table / Order Type:</label>
-                <select id="table-select" class="table-select" onchange="switchTable()">
+                <select id="table-select" class="table-select">
                     <option value="Takeout">Takeout / Walk-in</option>
                     <option value="Table 1">Table 1</option>
                     <option value="Table 2">Table 2</option>
@@ -238,43 +262,62 @@
             </div>
             
             <div class="action-buttons">
-                <button class="btn btn-proceed" onclick="proceedAndPrint()">Proceed & Print</button>
+                <button class="btn btn-proceed" onclick="sendOrderToCounter()">Send Order to Counter</button>
                 <button class="btn btn-clear" onclick="clearOrder()">Clear Order</button>
             </div>
         </div>
     </div>
 
-    <script>
-        let tableOrders = {
-            "Takeout": [], "Table 1": [], "Table 2": [], "Table 3": [], "Table 4": [], "Table 5": []
-        };
-        
-        let currentTable = "Takeout";
 
+    <!-- COUNTER DISPATCH LIVE VIEW INTERFACE -->
+    <div id="counter-ui" class="counter-view">
+        <div class="counter-header">
+            <h2>Counter Order Dashboard (Live Queue)</h2>
+            <button class="btn btn-clear" style="width: auto; padding: 10px 20px;" onclick="toggleInterface()">Back to Customer Menu</button>
+        </div>
+        <div id="orders-dashboard" class="orders-dashboard">
+            <!-- Dynamically populated kitchen cards land here -->
+        </div>
+    </div>
+
+    <script>
+        // Active memory for local cart checkout 
+        let activeCart = [];
+
+        // App Initializer & Real-time cross-tab tracking
+        window.onload = function() {
+            if(!localStorage.getItem('h2o_orders')) {
+                localStorage.setItem('h2o_orders', JSON.stringify([]));
+            }
+            updateReceiptDisplay();
+            renderCounterDashboard();
+
+            // Event listener watches localstorage events across other browser tabs/windows seamlessly
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'h2o_orders') {
+                    renderCounterDashboard();
+                    playNotificationSound();
+                }
+            });
+        };
+
+        // --- CUSTOMER INTERFACE FUNCTIONS ---
         function addToOrder(name, price) {
-            let currentOrder = tableOrders[currentTable];
-            let existingItem = currentOrder.find(item => item.name === name);
-            
+            let existingItem = activeCart.find(item => item.name === name);
             if (existingItem) {
                 existingItem.quantity += 1;
             } else {
-                currentOrder.push({ name: name, price: price, quantity: 1 });
+                activeCart.push({ name: name, price: price, quantity: 1 });
             }
             updateReceiptDisplay();
         }
 
         function addDrinkAddon(addonName, price) {
-            let currentOrder = tableOrders[currentTable];
-            if(currentOrder.length === 0) {
-                alert(`Please add an item to ${currentTable} first!`);
+            if(activeCart.length === 0) {
+                alert(`Please add a main item first before picking options!`);
                 return;
             }
-            currentOrder.push({ name: addonName, price: price, quantity: 1 });
-            updateReceiptDisplay();
-        }
-
-        function switchTable() {
-            currentTable = document.getElementById('table-select').value;
+            activeCart.push({ name: addonName, price: price, quantity: 1 });
             updateReceiptDisplay();
         }
 
@@ -284,9 +327,8 @@
             
             cartList.innerHTML = '';
             let total = 0;
-            let currentOrder = tableOrders[currentTable];
 
-            currentOrder.forEach(item => {
+            activeCart.forEach((item, index) => {
                 const itemTotal = item.price * item.quantity;
                 total += itemTotal;
 
@@ -294,7 +336,10 @@
                 li.className = 'cart-item';
                 li.innerHTML = `
                     <span>${item.quantity}x ${item.name}</span>
-                    <span>₱${itemTotal.toFixed(2)}</span>
+                    <div>
+                        <span style="margin-right:10px;">₱${itemTotal.toFixed(2)}</span>
+                        <span style="color:#e84118; cursor:pointer; font-weight:bold;" onclick="removeFromCart(${index})">✕</span>
+                    </div>
                 `;
                 cartList.appendChild(li);
             });
@@ -302,24 +347,125 @@
             totalDisplay.innerText = `₱${total.toFixed(2)}`;
         }
 
-        function clearOrder() {
-            tableOrders[currentTable] = [];
+        function removeFromCart(index) {
+            activeCart.splice(index, 1);
             updateReceiptDisplay();
         }
 
-        // --- NEW ACTION FUNCTION: PROCEED & PRINT/SAVE ---
-        function proceedAndPrint() {
-            let currentOrder = tableOrders[currentTable];
-            
-            if (currentOrder.length === 0) {
-                alert(`There are no active items in ${currentTable} to process!`);
+        function clearOrder() {
+            activeCart = [];
+            updateReceiptDisplay();
+        }
+
+        // --- SUBMIT COMPONENT (CUSTOMER TO STORAGE) ---
+        function sendOrderToCounter() {
+            if (activeCart.length === 0) {
+                alert(`Your order is empty. Select items from the menu first!`);
                 return;
             }
+
+            const targetTable = document.getElementById('table-select').value;
+            const database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+
+            // Compile localized receipt structure
+            const newOrder = {
+                id: 'H2O-' + Date.now(),
+                table: targetTable,
+                timestamp: new Date().toLocaleString(),
+                items: [...activeCart],
+                status: 'pending' // pending -> preparing -> completed
+            };
+
+            database.push(newOrder);
+            localStorage.setItem('h2o_orders', JSON.stringify(database));
+
+            alert(`Order successfully submitted to the Counter! Please wait while we process your request.`);
+            
+            // Clean interface slate for next customer
+            clearOrder();
+            renderCounterDashboard(); 
+        }
+
+
+        // --- COUNTER LOGIC CONTROLLERS ---
+        function renderCounterDashboard() {
+            const dashboard = document.getElementById('orders-dashboard');
+            if(!dashboard) return;
+            
+            const database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+            dashboard.innerHTML = '';
+
+            if(database.length === 0) {
+                dashboard.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #3ca0c9; font-size: 1.2rem; padding: 40px;">No incoming transactions yet.</p>`;
+                return;
+            }
+
+            // Map dynamically reverse ordered to keep cutting edge records up top
+            database.slice().reverse().forEach(order => {
+                let orderTotal = 0;
+                let itemsListHtml = '';
+
+                order.items.forEach(item => {
+                    const lineTotal = item.price * item.quantity;
+                    orderTotal += lineTotal;
+                    itemsListHtml += `<li style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span>${item.quantity}x ${item.name}</span>
+                        <span>₱${lineTotal.toFixed(2)}</span>
+                    </li>`;
+                });
+
+                const card = document.createElement('div');
+                card.className = `order-pane ${order.status}`;
+                card.innerHTML = `
+                    <span class="order-badge badge-${order.status}">${order.status}</span>
+                    <div>
+                        <h3 style="color:#fff; border-bottom:1px solid #255d7d; padding-bottom:5px;">${order.table}</h3>
+                        <small style="color:#3ca0c9;">ID: ${order.id} | ${order.timestamp}</small>
+                        <ul class="order-pane-items">${itemsListHtml}</ul>
+                        <div style="display:flex; justify-content:space-between; font-weight:bold; color:#4cd137; margin:5px 0;">
+                            <span>Total:</span><span>₱${orderTotal.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="pane-actions">
+                        ${order.status === 'pending' ? `<button class="btn-pane btn-prep" onclick="updateStatus('${order.id}', 'preparing')">Prepare</button>` : ''}
+                        ${order.status === 'preparing' ? `<button class="btn-pane btn-comp" onclick="updateStatus('${order.id}', 'completed')">Complete</button>` : ''}
+                        <button class="btn-pane btn-print" onclick="printReceiptFromCounter('${order.id}')">Print</button>
+                        <button class="btn-pane btn-del" onclick="deleteOrderRecord('${order.id}')">Delete</button>
+                    </div>
+                `;
+                dashboard.appendChild(card);
+            });
+        }
+
+        function updateStatus(orderId, newStatus) {
+            let database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+            let order = database.find(o => o.id === orderId);
+            if(order) {
+                order.status = newStatus;
+                localStorage.setItem('h2o_orders', JSON.stringify(database));
+                renderCounterDashboard();
+            }
+        }
+
+        function deleteOrderRecord(orderId) {
+            if(confirm("Are you sure you want to completely remove this order entry?")) {
+                let database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+                database = database.filter(o => o.id !== orderId);
+                localStorage.setItem('h2o_orders', JSON.stringify(database));
+                renderCounterDashboard();
+            }
+        }
+
+        // --- DYNAMIC SLIT RECEIPT EMULATOR PRINT ---
+        function printReceiptFromCounter(orderId) {
+            let database = JSON.parse(localStorage.getItem('h2o_orders')) || [];
+            let order = database.find(o => o.id === orderId);
+            if(!order) return;
 
             let total = 0;
             let receiptRows = '';
             
-            currentOrder.forEach(item => {
+            order.items.forEach(item => {
                 const itemTotal = item.price * item.quantity;
                 total += itemTotal;
                 receiptRows += `
@@ -330,15 +476,11 @@
                 `;
             });
 
-            const dateString = new Date().toLocaleString();
-
-            // Create a hidden iframe window customized specifically for clean document generation
             const printWindow = window.open('', '_blank', 'height=600,width=400');
-            
             printWindow.document.write(`
                 <html>
                 <head>
-                    <title>Receipt - ${currentTable}</title>
+                    <title>Receipt - ${order.table}</title>
                     <style>
                         body { font-family: 'Courier New', Courier, monospace; color: #000; padding: 20px; width: 300px; margin: 0 auto; }
                         .text-center { text-align: center; }
@@ -351,8 +493,9 @@
                     <h2 class="text-center">H2O CAFE</h2>
                     <p class="text-center" style="font-size: 0.9rem;">& PICA-PICA POS</p>
                     <div class="separator"></div>
-                    <p><strong>Type:</strong> ${currentTable}</p>
-                    <p><strong>Date:</strong> ${dateString}</p>
+                    <p><strong>Type/Table:</strong> ${order.table}</p>
+                    <p><strong>ID:</strong> ${order.id}</p>
+                    <p><strong>Date:</strong> ${order.timestamp}</p>
                     <div class="separator"></div>
                     <table>
                         <thead>
@@ -382,11 +525,48 @@
                 </body>
                 </html>
             `);
-            
             printWindow.document.close();
+        }
 
-            // Clear the table's cart after checkout is initiated
-            clearOrder();
+        // --- APP SYSTEM MANAGEMENT TOOLS ---
+        function toggleInterface() {
+            const leftUI = document.getElementById('customer-ui-left');
+            const rightUI = document.getElementById('customer-ui-right');
+            const counterUI = document.getElementById('counter-ui');
+
+            if(counterUI.style.display === 'flex') {
+                counterUI.style.display = 'none';
+                leftUI.style.display = 'block';
+                rightUI.style.display = 'flex';
+            } else {
+                // Prompt authentication protocol guard for counter entrance
+                const password = prompt("Enter counter access authorization pin:");
+                if(password === '1234' || password === '') { // Leave blank or type '1234'
+                    leftUI.style.display = 'none';
+                    rightUI.style.display = 'none';
+                    counterUI.style.display = 'flex';
+                    renderCounterDashboard();
+                } else {
+                    alert("Incorrect Pin Code Access Denied!");
+                }
+            }
+        }
+
+        function playNotificationSound() {
+            try {
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = context.createOscillator();
+                const gain = context.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, context.currentTime); // D5 Note
+                osc.frequency.setValueAtTime(880, context.currentTime + 0.15); // A5 Note
+                gain.gain.setValueAtTime(0.3, context.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(context.destination);
+                osc.start();
+                osc.stop(context.currentTime + 0.4);
+            } catch(e) { console.log("Audio notification failed to fire."); }
         }
     </script>
 </body>
